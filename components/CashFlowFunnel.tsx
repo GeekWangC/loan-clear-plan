@@ -18,6 +18,16 @@ export default function CashFlowFunnel({
 }: CashFlowFunnelProps) {
   const netBalance = salary - expenses - commercialLoanPayment - housingFundGap;
 
+  // 金额格式化
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('zh-CN', {
+      style: 'currency',
+      currency: 'CNY',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+  };
+
   const stages = [
     {
       label: '月薪入账',
@@ -58,7 +68,7 @@ export default function CashFlowFunnel({
   ];
 
   return (
-    <div className="bg-[#111] neon-box rounded-lg p-6">
+    <div className="bg-zinc-900/50 backdrop-blur-md rounded-lg p-6 border border-[#222] overflow-y-auto max-h-[calc(100vh-12rem)]">
       <h2 className="text-xl font-bold mb-6 neon-text flex items-center gap-2">
         <TrendingDown className="w-6 h-6" />
         现金流漏斗
@@ -94,7 +104,7 @@ export default function CashFlowFunnel({
                   <div className="flex items-center gap-2">
                     <Icon className="w-4 h-4" style={{ color: stage.color }} />
                     <span className="font-mono font-bold" style={{ color: stage.color }}>
-                      ¥{stage.value.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}
+                      {formatCurrency(stage.value)}
                     </span>
                   </div>
 
@@ -115,16 +125,16 @@ export default function CashFlowFunnel({
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.5 }}
-        className="mt-6 p-4 rounded-lg bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-500/50"
+        className="mt-6 p-4 rounded-lg bg-purple-900/20 backdrop-blur-sm border border-purple-500/50"
       >
         <div className="text-center">
           <div className="text-sm text-gray-400 mb-1">每月可投资金额</div>
           <div className="text-3xl font-bold text-purple-400 neon-text">
-            ¥{netBalance.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}
+            {formatCurrency(netBalance)}
           </div>
           <div className="text-xs text-gray-500 mt-2">
-            如果全部用于商贷提前还款，年可节省约 ¥
-            {(netBalance * 12 * 0.032).toLocaleString('zh-CN', { maximumFractionDigits: 0 })} 利息
+            如果全部用于商贷提前还款，年可节省约{' '}
+            {formatCurrency(netBalance * 12 * 0.032)} 利息
           </div>
         </div>
       </motion.div>

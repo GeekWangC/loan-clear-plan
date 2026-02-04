@@ -50,22 +50,32 @@ export default function ProgressBar({
         />
         <div className="absolute inset-0 flex items-center justify-between px-3">
           <span className="text-xs font-mono font-bold text-white z-10">
-            {current.toLocaleString('zh-CN')}{unit}
+            {current.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}{unit}
           </span>
           <span className="text-xs text-gray-400 z-10">
-            / {target.toLocaleString('zh-CN')}{unit}
+            / {target.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}{unit}
           </span>
         </div>
       </div>
 
       {remaining > 0 && (
         <div className="mt-1 text-xs text-gray-500 text-right">
-          剩余 {remaining.toLocaleString('zh-CN')}{unit}
+          剩余 {remaining.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}{unit}
         </div>
       )}
     </div>
   );
 }
+
+// 金额格式化
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('zh-CN', {
+    style: 'currency',
+    currency: 'CNY',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+};
 
 // 商贷进度条组件
 export function CommercialLoanProgress({
@@ -79,7 +89,7 @@ export function CommercialLoanProgress({
   const percentage = (paid / total) * 100;
 
   return (
-    <div className="bg-[#111] neon-box-red rounded-lg p-6">
+    <div className="bg-zinc-900/50 backdrop-blur-md rounded-lg p-6 border border-[#222] overflow-y-auto max-h-[calc(100vh-12rem)]">
       <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#ff3366' }}>
         <Target className="w-6 h-6" />
         商贷进度 (进攻目标)
@@ -95,16 +105,16 @@ export function CommercialLoanProgress({
       />
 
       <div className="grid grid-cols-2 gap-4 mt-4">
-        <div className="p-3 rounded bg-[#1a1a1a] border border-red-900/50">
+        <div className="p-3 rounded bg-[#1a1a1a]/80 backdrop-blur-sm border border-red-900/50">
           <div className="text-xs text-gray-400">剩余本金</div>
           <div className="text-lg font-mono font-bold text-red-400">
-            ¥{remaining.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}
+            {formatCurrency(remaining)}
           </div>
         </div>
-        <div className="p-3 rounded bg-[#1a1a1a] border border-red-900/50">
+        <div className="p-3 rounded bg-[#1a1a1a]/80 backdrop-blur-sm border border-red-900/50">
           <div className="text-xs text-gray-400">原始总额</div>
           <div className="text-lg font-mono font-bold text-red-400">
-            ¥{total.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}
+            {formatCurrency(total)}
           </div>
         </div>
       </div>
@@ -121,7 +131,7 @@ export function ReserveFundProgress({
   target: number;
 }) {
   return (
-    <div className="bg-[#111] neon-box-blue rounded-lg p-6">
+    <div className="bg-zinc-900/50 backdrop-blur-md rounded-lg p-6 border border-[#222] overflow-y-auto max-h-[calc(100vh-12rem)]">
       <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#00ccff' }}>
         <Shield className="w-6 h-6" />
         备用金护盾
@@ -136,7 +146,7 @@ export function ReserveFundProgress({
         unit="元"
       />
 
-      <div className="mt-4 p-3 rounded bg-[#1a1a1a] border border-blue-900/50">
+      <div className="mt-4 p-3 rounded bg-[#1a1a1a]/80 backdrop-blur-sm border border-blue-900/50">
         <div className="flex items-center justify-between">
           <div className="text-xs text-gray-400">护盾完整度</div>
           <div className="text-sm font-mono font-bold text-blue-400">

@@ -17,9 +17,17 @@ export default function InterestBurner({
 }: InterestBurnerProps) {
   const [prepayment, setPrepayment] = useState(30000);
 
+  // 金额格式化
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('zh-CN', {
+      style: 'currency',
+      currency: 'CNY',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+  };
+
   // 计算等额本金下的月供减少
-  // 等额本金：每月固定本金 + 剩余本金 * 月利率
-  // 提前还款后，剩余本金减少，月供中的利息部分减少
   const monthlyRate = interestRate / 100 / 12;
 
   // 当前月供（利息部分）
@@ -34,8 +42,7 @@ export default function InterestBurner({
   // 月供减少额
   const monthlyReduction = currentMonthlyPayment - newMonthlyPayment;
 
-  // 估算节省的总利息（简化计算：假设剩余期限相同）
-  // 实际计算需要考虑剩余期限，这里使用近似公式
+  // 估算节省的总利息
   const remainingMonths = Math.ceil(currentPrincipal / monthlyPrincipal);
   const totalInterestSaved = prepayment * monthlyRate * (remainingMonths / 2);
 
@@ -43,10 +50,7 @@ export default function InterestBurner({
   const reductionPercentage = (monthlyReduction / currentMonthlyPayment) * 100;
 
   return (
-    <div className="bg-[#111] rounded-lg p-6" style={{
-      border: '1px solid rgba(255, 51, 102, 0.5)',
-      boxShadow: '0 0 10px rgba(255, 51, 102, 0.3)',
-    }}>
+    <div className="bg-zinc-900/50 backdrop-blur-md rounded-lg p-6 border border-[#222] overflow-y-auto max-h-[calc(100vh-12rem)]">
       <h2 className="text-xl font-bold mb-6 flex items-center gap-2" style={{ color: '#ff3366' }}>
         <Flame className="w-6 h-6" />
         利息焚烧炉模拟器
@@ -61,13 +65,13 @@ export default function InterestBurner({
             type="number"
             value={prepayment}
             onChange={(e) => setPrepayment(Number(e.target.value))}
-            className="flex-1 bg-[#1a1a1a] border border-red-900/50 rounded px-4 py-3 text-2xl font-mono font-bold text-red-400 focus:outline-none focus:border-red-500 transition-all"
+            className="flex-1 bg-[#1a1a1a]/80 backdrop-blur-sm border border-red-900/50 rounded px-4 py-3 text-2xl font-mono font-bold text-red-400 focus:outline-none focus:border-red-500 transition-all"
             min="0"
             max={currentPrincipal}
             step="1000"
           />
           <div className="text-sm text-gray-500">
-            当前本金<br />¥{currentPrincipal.toLocaleString('zh-CN', { maximumFractionDigits: 0 })}
+            当前本金<br />{formatCurrency(currentPrincipal)}
           </div>
         </div>
 
@@ -85,7 +89,7 @@ export default function InterestBurner({
               className={`px-3 py-1 rounded text-sm transition-all ${
                 prepayment === option.value
                   ? 'bg-red-500 text-white'
-                  : 'bg-[#1a1a1a] text-gray-400 hover:bg-red-900/30'
+                  : 'bg-[#1a1a1a]/80 backdrop-blur-sm text-gray-400 hover:bg-red-900/30'
               }`}
             >
               {option.label}
@@ -95,7 +99,7 @@ export default function InterestBurner({
       </div>
 
       {/* 燃烧效果 */}
-      <div className="relative mb-6 p-6 rounded-lg bg-gradient-to-b from-orange-900/20 to-red-900/20 border border-red-500/30">
+      <div className="relative mb-6 p-6 rounded-lg bg-gradient-to-b from-orange-900/20 to-red-900/20 backdrop-blur-sm border border-red-500/30">
         <motion.div
           animate={{ scale: [1, 1.05, 1] }}
           transition={{ duration: 2, repeat: Infinity }}
@@ -113,7 +117,7 @@ export default function InterestBurner({
               animate={{ scale: 1 }}
               className="text-2xl font-mono font-bold text-red-400"
             >
-              ¥{monthlyReduction.toFixed(2)}
+              {formatCurrency(monthlyReduction)}
             </motion.div>
             <div className="text-xs text-red-500 mt-1">
               {reductionPercentage.toFixed(1)}%
@@ -129,7 +133,7 @@ export default function InterestBurner({
               transition={{ delay: 0.1 }}
               className="text-2xl font-mono font-bold text-orange-400"
             >
-              ¥{totalInterestSaved.toLocaleString('zh-CN', { maximumFractionDigits: 0 })}
+              {formatCurrency(totalInterestSaved)}
             </motion.div>
             <div className="text-xs text-orange-500 mt-1">估算值</div>
           </div>
@@ -143,10 +147,10 @@ export default function InterestBurner({
               transition={{ delay: 0.2 }}
               className="text-2xl font-mono font-bold text-red-400"
             >
-              ¥{newPrincipal.toLocaleString('zh-CN', { maximumFractionDigits: 0 })}
+              {formatCurrency(newPrincipal)}
             </motion.div>
             <div className="text-xs text-red-500 mt-1">
-              -¥{prepayment.toLocaleString()}
+              -{formatCurrency(prepayment)}
             </div>
           </div>
         </div>
@@ -157,14 +161,14 @@ export default function InterestBurner({
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-400">当前月供</span>
           <span className="font-mono text-red-400">
-            ¥{currentMonthlyPayment.toFixed(2)}
+            {formatCurrency(currentMonthlyPayment)}
           </span>
         </div>
 
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-400">还款后月供</span>
           <span className="font-mono text-green-400">
-            ¥{newMonthlyPayment.toFixed(2)}
+            {formatCurrency(newMonthlyPayment)}
           </span>
         </div>
 
@@ -176,19 +180,19 @@ export default function InterestBurner({
             月供减少
           </span>
           <span className="font-mono text-xl font-bold text-yellow-400">
-            -¥{monthlyReduction.toFixed(2)}
+            {formatCurrency(monthlyReduction)}
           </span>
         </div>
       </div>
 
       {/* 提示信息 */}
-      <div className="mt-4 p-3 rounded bg-[#1a1a1a] border border-yellow-900/50">
+      <div className="mt-4 p-3 rounded bg-[#1a1a1a]/80 backdrop-blur-sm border border-yellow-900/50">
         <div className="flex items-start gap-2">
           <TrendingDown className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
           <div className="text-xs text-gray-400">
-            提前还款 ¥{(prepayment / 10000).toFixed(1)} 万，
-            下个月起月供减少 <span className="text-yellow-400 font-bold">¥{monthlyReduction.toFixed(2)}</span>，
-            累计可节省利息约 <span className="text-orange-400 font-bold">¥{totalInterestSaved.toLocaleString('zh-CN', { maximumFractionDigits: 0 })}</span>
+            提前还款 {formatCurrency(prepayment)}，
+            下个月起月供减少 <span className="text-yellow-400 font-bold">{formatCurrency(monthlyReduction)}</span>，
+            累计可节省利息约 <span className="text-orange-400 font-bold">{formatCurrency(totalInterestSaved)}</span>
           </div>
         </div>
       </div>
